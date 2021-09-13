@@ -1,0 +1,35 @@
+{
+    "name": "gurucomkz/data-object-logger",
+    "description": "Data Objects Events Logger SilverStripe",
+    "license": "BSD-3-Clause",
+    "type": "silverstripe-vendormodule",
+    "keywords": [
+        "silverstripe",
+        "events",
+        "log"
+    ],
+    "authors": [
+        {
+            "name": "Sergey Shevchenko",
+            "homepage": "http://github.com/gurucomkz"
+        }
+    ],
+    "require": {
+        "silverstripe/framework": "^4",
+        "silverstripe/crontask": "^2.2"
+    },
+    "require-dev": {
+    },
+    "autoload": {
+        "psr-4": {
+            "Gurucomkz\\DataObjectLogger\\": "src/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.x-dev"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

@@ -1,0 +1,23 @@
+---
+Name: dataobjectlogger
+---
+Gurucomkz\DataObjectLogger\LoggingExtension:
+  retain_days: 200
+  purge_cron: "0 * * * *" # set to false to disable
+  excluded_classes:
+    - Gurucomkz\DataObjectLogger\ActivityLogEntry
+    - SilverStripe\Security\RememberLoginHash
+    - SilverStripe\Security\LoginAttempt
+    - SilverStripe\Security\MemberPassword
+    - SilverStripe\Versioned\ChangeSetItem
+    - SilverStripe\Versioned\ChangeSet
+    - DNADesign\Elemental\Models\ElementalArea
+    - SilverStripe\Assets\Image
+    - SilverStripe\Assets\File
+    - SilverStripe\Assets\Folder
+    - SilverStripe\Assets\Shortcodes\FileLink
+    - gorriecoe\Menu\Models\MenuSet
+
+SilverStripe\ORM\DataObject:
+  extensions:
+      - Gurucomkz\DataObjectLogger\LoggingExtension
