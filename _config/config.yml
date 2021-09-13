@@ -17,6 +17,7 @@ Gurucomkz\DataObjectLogger\LoggingExtension:
     - SilverStripe\Assets\Folder
     - SilverStripe\Assets\Shortcodes\FileLink
     - gorriecoe\Menu\Models\MenuSet
+    - SilverStripe\CronTask\CronTaskStatus
 
 SilverStripe\ORM\DataObject:
   extensions:
