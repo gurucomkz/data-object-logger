@@ -42,6 +42,12 @@ class ActivityLogEntry extends DataObject
 
     private static $owns = [
     ];
+    
+    private static $searchable_fields = [
+        'Action',
+        'ObjectClass',
+        'ObjectID',
+    ];
 
     private static $summary_fields = [
         'Title' => 'Event',
