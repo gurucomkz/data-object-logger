@@ -40,9 +40,31 @@ class ActivityLogEntry extends DataObject
         'Member' => Member::class,
     ];
 
+    private static $indexes = [
+        'ObjectClassID' => [
+            'type' => 'index',
+            'columns' => [
+                'ObjectClass',
+                'ObjectID',
+            ],
+        ],
+        'ObjectClass' => [
+            'type' => 'index',
+            'columns' => [
+                'ObjectClass',
+            ],
+        ],
+        'ObjectID' => [
+            'type' => 'index',
+            'columns' => [
+                'ObjectID',
+            ],
+        ],
+    ];
+
     private static $owns = [
     ];
-    
+
     private static $searchable_fields = [
         'Action',
         'ObjectClass',
@@ -61,6 +83,11 @@ class ActivityLogEntry extends DataObject
         $shortCls = basename(str_replace('\\', '/', $this->ObjectClass));
         $memberName = $this->Member->exists() ? $this->Member->getTitle() : ($this->MemberID ? 'Deleted User' : 'System');
         return "$memberName did '$this->Action' on $shortCls#{$this->ObjectID}";
+    }
+
+    public function getDetailsRaw()
+    {
+        return $this->record['Details'];
     }
 
     public function getDetails()
