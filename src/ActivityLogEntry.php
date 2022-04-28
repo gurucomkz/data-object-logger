@@ -29,7 +29,7 @@ class ActivityLogEntry extends DataObject
 
     private static $db = [
         'Action' => "Enum('Create,Update,Delete,Publish,Unpublish,Archive,Unarchive')",
-        'ObjectClass' => "Varchar",
+        'ObjectClass' => "Varchar(255)",
         'ObjectID' => "Int",
         'Details' => "Text",
     ];
