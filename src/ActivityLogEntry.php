@@ -2,6 +2,7 @@
 
 namespace Gurucomkz\DataObjectLogger;
 
+use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
 use SilverStripe\View\Parsers\HTML4Value;
@@ -29,18 +30,25 @@ class ActivityLogEntry extends DataObject
 
     private static $db = [
         'Action' => "Enum('Create,Update,Delete,Publish,Unpublish,Archive,Unarchive')",
-        'ObjectClass' => "Varchar",
-        'ObjectID' => "Int",
         'Details' => "Text",
     ];
     // private static $searchable_fields = [
     // ];
 
     private static $has_one = [
+        'Object' => DataObject::class,
         'Member' => Member::class,
     ];
 
     private static $indexes = [
+        'ActionObject' => [
+            'type' => 'index',
+            'columns' => [
+                'Action',
+                'ObjectClass',
+                'ObjectID',
+            ],
+        ],
         'ObjectClassID' => [
             'type' => 'index',
             'columns' => [
@@ -60,15 +68,21 @@ class ActivityLogEntry extends DataObject
                 'ObjectID',
             ],
         ],
+        'Action' => [
+            'type' => 'index',
+            'columns' => [
+                'Action',
+            ],
+        ],
     ];
 
     private static $owns = [
     ];
 
     private static $searchable_fields = [
-        'Action',
-        'ObjectClass',
-        'ObjectID',
+        'Action' => 'ExactMatchFilter',
+        'ObjectClass' => 'ExactMatchFilter',
+        'ObjectID' => 'ExactMatchFilter',
     ];
 
     private static $summary_fields = [
@@ -93,6 +107,13 @@ class ActivityLogEntry extends DataObject
     public function getDetails()
     {
         return HTML4Value::create('<span style="font-family: Menlo,Monaco,Consolas,Courier New,monospace;white-space: pre;font-size: 0.8em;">' . htmlspecialchars($this->record['Details']) . '</span>');
+    }
+
+    public function getCMSFields()
+    {
+        $fields = parent::getCMSFields();
+        $fields->replaceField('MemberID', ReadonlyField::create('MemberTitle')->setValue($this->Member->Title));
+        return $fields;
     }
 
     public function canEdit($var = null)
