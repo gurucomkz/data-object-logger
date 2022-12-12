@@ -1,8 +1,6 @@
 <?php
 namespace Gurucomkz\DataObjectLogger;
 
-use LeKoala\CmsActions\CustomLink;
-use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Security;
@@ -12,35 +10,6 @@ use SilverStripe\Security\Security;
  */
 class LoggingExtension extends DataExtension
 {
-
-    /**
-     * Update Fields
-     * @return FieldList
-     */
-    public function updateCMSActions(FieldList $actions)
-    {
-        $cls = str_replace('\\', '-', ActivityLogEntry::class);
-
-        $url = '/admin/activity/?' . http_build_query([
-            $cls . '[GridState]' => json_encode([
-                'GridFieldFilterHeader' => [
-                    'Columns'=>[
-                        'ObjectClass' => get_class($this->owner),
-                        'ObjectID' => strval($this->owner->ID),
-                    ]
-                ]
-            ])
-        ]);
-
-        $historyButton = CustomLink::create('ViewChanges', 'Change log...', $url)
-            ->removeExtraClass('btn-info')
-            ->setButtonIcon('back-in-time')
-            ->setDropUp(true);
-        $actions->push($historyButton);
-
-        return $actions;
-    }
-
     public function classValidToLog()
     {
         $excluded = LogUtils::config()->get('excluded_classes');

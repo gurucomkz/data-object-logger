@@ -16,7 +16,6 @@
     ],
     "require": {
         "silverstripe/framework": "^4",
-        "lekoala/silverstripe-cms-actions": "^1.2",
         "silverstripe/crontask": "^2.2"
     },
     "require-dev": {

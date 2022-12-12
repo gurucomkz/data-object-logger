@@ -1,5 +1,6 @@
 ---
 Name: dataobjectlogger
+After: '*'
 ---
 Gurucomkz\DataObjectLogger\LoggingExtension:
   retain_days: 200
@@ -21,4 +22,8 @@ Gurucomkz\DataObjectLogger\LoggingExtension:
 
 SilverStripe\ORM\DataObject:
   extensions:
-      - Gurucomkz\DataObjectLogger\LoggingExtension
+    - Gurucomkz\DataObjectLogger\LoggingExtension
+
+SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest:
+  extensions:
+    - Gurucomkz\DataObjectLogger\GridFieldDetailFormExtension
