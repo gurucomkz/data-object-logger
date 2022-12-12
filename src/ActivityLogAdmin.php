@@ -3,6 +3,7 @@
 namespace Gurucomkz\DataObjectLogger;
 
 use SilverStripe\Admin\ModelAdmin;
+use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Security\PermissionProvider;
 
 class ActivityLogAdmin extends ModelAdmin implements PermissionProvider
@@ -28,5 +29,25 @@ class ActivityLogAdmin extends ModelAdmin implements PermissionProvider
             // 'VIEW_CLAIMS' => ['name' => 'View all claims', 'category' => 'Promos management'],
             // 'EDIT_CLAIMS' => ['name' => 'Edit or add claims', 'category' => 'Promos management'],
         ];
+    }
+
+    protected function getGridField(): GridField
+    {
+        $field = parent::getGridField();
+
+        $this->applyGridFieldState($field);
+
+        return $field;
+    }
+
+    public function applyGridFieldState(GridField $gridField)
+    {
+        $stateInput = $gridField->getState(false);
+        $request = $this->getRequest();
+
+        $value = $request->requestVar($gridField->getName());
+        if (is_array($value) && isset($value['GridState'])) {
+            $stateInput->setValue($value['GridState']);
+        }
     }
 }
