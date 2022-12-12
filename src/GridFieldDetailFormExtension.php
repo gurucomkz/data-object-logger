@@ -3,7 +3,6 @@ namespace Gurucomkz\DataObjectLogger;
 
 use SilverStripe\Security\Permission;
 use SilverStripe\Core\Extension;
-use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\Form;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
 use SilverStripe\Forms\LiteralField;
@@ -14,11 +13,6 @@ use SilverStripe\View\HTML;
  */
 class GridFieldDetailFormExtension extends Extension
 {
-
-    /**
-     * Update Fields
-     * @return FieldList
-     */
     public function updateItemEditForm(Form $form)
     {
         if (!$this->classValidToLog()) {
