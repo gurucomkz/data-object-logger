@@ -3,6 +3,7 @@
 namespace Gurucomkz\DataObjectLogger;
 
 use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
 use SilverStripe\View\Parsers\HTML4Value;
@@ -109,9 +110,27 @@ class ActivityLogEntry extends DataObject
         return HTML4Value::create('<span style="font-family: Menlo,Monaco,Consolas,Courier New,monospace;white-space: pre;font-size: 0.8em;">' . htmlspecialchars($this->record['Details']) . '</span>');
     }
 
+    public function getDetailsDiff()
+    {
+        if (!$this->isInDB()) {
+            return null;
+        }
+        $prev = self::get()->filter([
+            'ID:LessThan' => $this->ID,
+            'ObjectClass' => $this->ObjectClass,
+            'ObjectID' => $this->ObjectID,
+        ])->sort('ID DESC')->first();
+        if (!$prev) {
+            return null;
+        }
+        $json = json_encode(LogUtils::diff($prev->record['Details'], $this->record['Details']), JSON_PRETTY_PRINT);
+        return HTML4Value::create('<span style="font-family: Menlo,Monaco,Consolas,Courier New,monospace;white-space: pre;font-size: 0.8em;">' . htmlspecialchars($json) . '</span>');
+    }
+
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
+        $fields->addFieldsToTab('Root.Main', TextField::create('DetailsDiff'), 'Details');
         $fields->replaceField('MemberID', ReadonlyField::create('MemberTitle')->setValue($this->Member->Title));
         return $fields;
     }
