@@ -7,6 +7,8 @@ use SilverStripe\ORM\DB;
 
 class LogUtils
 {
+    const LONG_ID = 'DataObjectLoggerLongDB';
+
     public static function config()
     {
         return Config::forClass(ActivityLogEntry::class);
@@ -18,11 +20,26 @@ class LogUtils
         $cutoff_time = time() - $retain_days * 86400;
 
         $tbl = Config::forClass(ActivityLogEntry::class)->get('table_name');
-        DB::query(sprintf(
+        self::QuickDB()->query(sprintf(
             'DELETE FROM "%s" WHERE Created <= \'%s\'',
             $tbl,
             date('Y-m-d H:i:s', $cutoff_time)
         ));
+        self::LongDB()->query(sprintf(
+            'DELETE FROM "%s" WHERE Created <= \'%s\'',
+            $tbl,
+            date('Y-m-d H:i:s', $cutoff_time)
+        ));
+    }
+
+    public static function QuickDB()
+    {
+        return DB::get_conn();
+    }
+
+    public static function LongDB()
+    {
+        return DB::get_conn(self::LONG_ID);
     }
 
     public static function diff($a, $b)
