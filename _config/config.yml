@@ -2,15 +2,6 @@
 Name: dataobjectlogger
 After: '*'
 ---
-SilverStripe\ORM\DB:
-  DataObjectLoggerLongDB:
-    type: MySQLDatabase
-    server: "`DATA_OBJECT_LOGGER_LONG_HOST`"
-    database: "`DATA_OBJECT_LOGGER_LONG_DATABASE`"
-    username: "`DATA_OBJECT_LOGGER_LONG_USER`"
-    password: "`DATA_OBJECT_LOGGER_LONG_PASSWORD`"
-    port: "`DATA_OBJECT_LOGGER_LONG_PORT`"
-
 Gurucomkz\DataObjectLogger\LoggingExtension:
   quick_access_days: 30
   quick_to_long_batch: 300
