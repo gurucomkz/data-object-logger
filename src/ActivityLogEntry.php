@@ -2,6 +2,9 @@
 
 namespace Gurucomkz\DataObjectLogger;
 
+use SilverStripe\Core\ClassInfo;
+use SilverStripe\Core\Injector\Injector;
+use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataObject;
@@ -31,13 +34,12 @@ class ActivityLogEntry extends DataObject
 
     private static $db = [
         'Action' => "Enum('Create,Update,Delete,Publish,Unpublish,Archive,Unarchive')",
+        'ObjectID' => "Int",
+        'ObjectClass' => "Varchar",
         'Details' => "Text",
     ];
-    // private static $searchable_fields = [
-    // ];
 
     private static $has_one = [
-        'Object' => DataObject::class,
         'Member' => Member::class,
     ];
 
@@ -105,6 +107,12 @@ class ActivityLogEntry extends DataObject
         return $this->record['Details'];
     }
 
+    public function getObject()
+    {
+        // simulate getComponent() behaviour
+        return DataObject::get($this->ObjectClass)->byID($this->ObjectID) ?? Injector::inst()->create($this->ObjectClass);
+    }
+
     public function getDetails()
     {
         return HTML4Value::create('<span style="font-family: Menlo,Monaco,Consolas,Courier New,monospace;white-space: pre;font-size: 0.8em;">' . htmlspecialchars($this->record['Details']) . '</span>');
@@ -132,6 +140,30 @@ class ActivityLogEntry extends DataObject
         $fields = parent::getCMSFields();
         $fields->addFieldsToTab('Root.Main', TextField::create('DetailsDiff'), 'Details');
         $fields->replaceField('MemberID', ReadonlyField::create('MemberTitle')->setValue($this->Member->Title));
+        return $fields;
+    }
+
+    public function scaffoldSearchFields($_params = null)
+    {
+        $fields = parent::scaffoldSearchFields($_params);
+
+        $allClasses = ClassInfo::dataClassesFor(DataObject::class);
+        array_shift($allClasses);
+        $classSelectoptions = [
+            '' => '',
+        ];
+        foreach ($allClasses as $cls) {
+            $clsSplit = explode('\\', $cls);
+            $last = array_pop($clsSplit);
+            $clsTitle = $last;
+            if (count($clsSplit)) {
+                $clsTitle .= ' @ ' . implode('\\', $clsSplit);
+            }
+            $classSelectoptions[$cls] = $clsTitle;
+        }
+        sort($classSelectoptions);
+        $classSelect = DropdownField::create('ObjectClass', null, $classSelectoptions)->setHasEmptyDefault(true);
+        $fields->replaceField('ObjectClass', $classSelect);
         return $fields;
     }
 
