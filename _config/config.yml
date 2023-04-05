@@ -19,6 +19,11 @@ Gurucomkz\DataObjectLogger\LoggingExtension:
     - SilverStripe\Assets\Shortcodes\FileLink
     - gorriecoe\Menu\Models\MenuSet
     - SilverStripe\CronTask\CronTaskStatus
+    - Symbiote\QueuedJobs\DataObjects\QueuedJobDescriptor
+    - Symbiote\QueuedJobs\DataObjects\QueuedJobRule
+    - SilverStripe\SessionManager\Models\LoginSession
+    - LeKoala\EmailTemplates\Models\SentEmail
+    - SilverStripe\MFA\Model\RegisteredMethod
 
 SilverStripe\ORM\DataObject:
   extensions:
