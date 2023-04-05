@@ -15,6 +15,7 @@ class ActivityLogAdmin extends ModelAdmin implements PermissionProvider
 
     private static $menu_priority = -5;
 
+    public $showImportForm = false;
 
     private static $managed_models = [
         ActivityLogEntry::class,
