@@ -21,14 +21,12 @@ class ActivityLogAdmin extends ModelAdmin implements PermissionProvider
         ActivityLogEntry::class,
     ];
 
+    const PERM_RECOVER = 'ActivityLogEntry_RECOVER';
+
     public function providePermissions()
     {
         return [
-            // 'VIEW_PROMOS' => ['name' => 'View all promos', 'category' => 'Promos management'],
-            // 'EDIT_PROMOS' => ['name' => 'Edit or add promos', 'category' => 'Promos management'],
-
-            // 'VIEW_CLAIMS' => ['name' => 'View all claims', 'category' => 'Promos management'],
-            // 'EDIT_CLAIMS' => ['name' => 'Edit or add claims', 'category' => 'Promos management'],
+            self::PERM_RECOVER => 'Recover Deleted Objects from Activity Log',
         ];
     }
 

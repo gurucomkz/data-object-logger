@@ -2,13 +2,17 @@
 
 namespace Gurucomkz\DataObjectLogger;
 
+use Exception;
+use LeKoala\CmsActions\CustomAction;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
+use SilverStripe\Security\Permission;
 use SilverStripe\View\Parsers\HTML4Value;
 
 /**
@@ -107,6 +111,9 @@ class ActivityLogEntry extends DataObject
         return $this->record['Details'];
     }
 
+    /**
+     * @return DataObject
+     */
     public function getObject()
     {
         // simulate getComponent() behaviour
@@ -165,6 +172,61 @@ class ActivityLogEntry extends DataObject
         $classSelect = DropdownField::create('ObjectClass', null, $classSelectoptions)->setHasEmptyDefault(true);
         $fields->replaceField('ObjectClass', $classSelect);
         return $fields;
+    }
+
+
+    /**
+     * Update Actions
+     * @return FieldList
+     */
+    public function updateCMSActions(FieldList $actions)
+    {
+        if ($this->canRecover()) {
+            $exists = $this->targetObjectExists();
+            if (!$exists) {
+                $actions->push(
+                    CustomAction::create('doRecover', 'Recover')
+                );
+            }
+        }
+        return $actions;
+    }
+
+    public function canRecover()
+    {
+        return $this->owner->Action == ActivityLogEntry::ACTION_DELETE && Permission::check(ActivityLogAdmin::PERM_RECOVER);
+    }
+
+    public function doRecover()
+    {
+        if (!$this->canRecover()) {
+            throw new Exception('Forbidden');
+        }
+        $cls = $this->owner->ObjectClass;
+        if (!class_exists($cls)) {
+            throw new Exception(sprintf('Implementation of %s not available', $cls));
+        }
+        $exists = $this->getObject()->exists();
+        if ($exists) {
+            throw new Exception('Object already exists');
+        }
+
+        $data = json_decode($this->owner->getDetailsRaw(), true);
+        /** @var DataObject */
+        $obj = new $cls($data, DataObject::CREATE_MEMORY_HYDRATED);
+
+        $obj->extend('onBeforeRecovery');
+
+        $obj->write(false, true, true);
+
+        $obj->extend('onAfterRecovery');
+
+        $exists = $this->getObject()->exists();
+        if ($exists) {
+            return sprintf("Recovered '%s' OK", $obj->getTitle());
+        } else {
+            throw new Exception('Failed to write for unknown reason');
+        }
     }
 
     public function canEdit($var = null)
