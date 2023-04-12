@@ -21,6 +21,11 @@ class GridFieldDetailFormExtension extends Extension
         if (!Permission::check('CMS_ACCESS_' . ActivityLogAdmin::class)) {
             return;
         }
+        $record = $this->owner->getRecord();
+            
+        if (!$record->ID) {
+            return;
+        }
         $actions = $form->Actions();
 
         $cls = str_replace('\\', '-', ActivityLogEntry::class);
@@ -29,8 +34,8 @@ class GridFieldDetailFormExtension extends Extension
             $cls . '[GridState]' => json_encode([
                 'GridFieldFilterHeader' => [
                     'Columns'=>[
-                        'ObjectClass' => $this->owner->getRecord()->ClassName,
-                        'ObjectID' => strval($this->owner->getRecord()->ID),
+                        'ObjectClass' => $record->ClassName,
+                        'ObjectID' => strval($record->ID),
                     ]
                 ]
             ])
