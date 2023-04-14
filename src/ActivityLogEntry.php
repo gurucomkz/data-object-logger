@@ -168,7 +168,7 @@ class ActivityLogEntry extends DataObject
             }
             $classSelectoptions[$cls] = $clsTitle;
         }
-        sort($classSelectoptions);
+        asort($classSelectoptions);
         $classSelect = DropdownField::create('ObjectClass', null, $classSelectoptions)->setHasEmptyDefault(true);
         $fields->replaceField('ObjectClass', $classSelect);
         return $fields;
