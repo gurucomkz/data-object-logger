@@ -179,10 +179,11 @@ class ActivityLogEntry extends DataObject
      * Update Actions
      * @return FieldList
      */
-    public function updateCMSActions(FieldList $actions)
+    public function getCMSActions()
     {
+        $actions = parent::getCMSActions();
         if ($this->canRecover()) {
-            $exists = $this->targetObjectExists();
+            $exists = $this->getObject()->exists();
             if (!$exists) {
                 $actions->push(
                     CustomAction::create('doRecover', 'Recover')
