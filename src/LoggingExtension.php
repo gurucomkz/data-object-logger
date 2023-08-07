@@ -1,6 +1,7 @@
 <?php
 namespace Gurucomkz\DataObjectLogger;
 
+use SilverStripe\Core\Environment;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Security;
@@ -88,6 +89,17 @@ class LoggingExtension extends DataExtension
 
             $user = Security::getCurrentUser();
             $entry->MemberID = $user ? $user->ID : 0;
+
+            if (Environment::getEnv('OBJECT_LOGGER_DEBUG')) {
+                $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 15);
+                foreach ($backtrace as $traceCall) {
+                    if ($traceCall['function'] === 'write') {
+                        $entry->CallFile = $traceCall['file'];
+                        $entry->CallLine = $traceCall['line'];
+                        break;
+                    }
+                }
+            }
 
             $entry->write();
         } catch (\Throwable $e) {

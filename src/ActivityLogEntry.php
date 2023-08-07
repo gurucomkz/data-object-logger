@@ -19,6 +19,8 @@ use SilverStripe\View\Parsers\HTML4Value;
  * @property string $Action
  * @property string $ObjectClass
  * @property string $Details
+ * @property string $CallFile
+ * @property integer $CallLine
  * @property integer $ObjectID
  * @property integer $MemberID
  * @property-read Member $Member
@@ -41,6 +43,8 @@ class ActivityLogEntry extends DataObject
         'ObjectID' => "Int",
         'ObjectClass' => "Varchar",
         'Details' => "Text",
+        'CallFile' => "Text",
+        'CallLine' => "Int",
     ];
 
     private static $has_one = [
