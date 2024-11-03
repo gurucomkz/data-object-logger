@@ -1,7 +1,8 @@
-name: "On push: PHP 8.2"
+name: "Static checks: PHP 8.2"
 
 on:
   - push
+  - pull_request
 
 permissions:
   contents: read
