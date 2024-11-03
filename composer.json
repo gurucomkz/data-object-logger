@@ -21,6 +21,8 @@
         "silverstripe/crontask": "^3.0"
     },
     "require-dev": {
+        "silverstripe/cms": "^5",
+        "phpstan/phpstan": "^1.10"
     },
     "autoload": {
         "psr-4": {
@@ -33,5 +35,12 @@
         }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "composer/installers": false,
+            "silverstripe/vendor-plugin": false,
+            "silverstripe/recipe-plugin": false
+        }
+    }
 }

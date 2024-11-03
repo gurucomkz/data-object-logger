@@ -1,0 +1,24 @@
+name: "On push: PHP 8.2"
+
+on:
+  - push
+
+permissions:
+  contents: read
+
+env:
+    PHP_VERSION: 8.2
+    COMPOSER_ALLOW_SUPERUSER: '1' # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
+jobs:
+  phpstan:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ env.PHP_VERSION }}
+    - uses: actions/checkout@v4
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress
+    - name: "Run PHPSTAN"
+      run: vendor/bin/phpstan

@@ -25,13 +25,23 @@ class LoggingExtension extends DataExtension
         $this->doLog(ActivityLogEntry::ACTION_DELETE);
     }
 
+    const CREATION_FLAG = '_logger_being_created';
+
+    public function isCreated(?bool $setTo = null)
+    {
+        if($setTo !== null) {
+            return $this->owner->setDynamicData('_logger_being_created', $setTo);
+        }
+        return $this->owner->getDynamicData('_logger_being_created');
+    }
+
     public function onBeforeWrite()
     {
         parent::onBeforeWrite();
         if (!$this->classValidToLog()) {
             return; //don't log the log entries :)
         }
-        $this->owner->_logger_being_created = !$this->owner->isInDB();
+        $this->isCreated(!$this->owner->isInDB());
     }
 
     public function onAfterWrite()
@@ -41,10 +51,10 @@ class LoggingExtension extends DataExtension
             return; //don't log the log entries :)
         }
 
-        if (!$this->owner->_logger_being_created && !count($this->owner->getChangedFields(null, DataObject::CHANGE_VALUE))) {
+        if (!$this->isCreated() && !count($this->owner->getChangedFields(false, DataObject::CHANGE_VALUE))) {
             return;
         }
-        $this->doLog($this->owner->_logger_being_created ? ActivityLogEntry::ACTION_CREATE : ActivityLogEntry::ACTION_UPDATE);
+        $this->doLog($this->isCreated() ? ActivityLogEntry::ACTION_CREATE : ActivityLogEntry::ACTION_UPDATE);
     }
 
     public function onAfterArchive()

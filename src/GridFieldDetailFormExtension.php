@@ -21,6 +21,7 @@ class GridFieldDetailFormExtension extends Extension
         if (!Permission::check('CMS_ACCESS_' . ActivityLogAdmin::class)) {
             return;
         }
+        /** @var \SilverStripe\ORM\DataObject */
         $record = $this->owner->getRecord();
             
         if (!$record->ID) {
@@ -61,6 +62,9 @@ class GridFieldDetailFormExtension extends Extension
     public function classValidToLog()
     {
         $excluded = LogUtils::config()->get('excluded_classes');
-        return !in_array($this->owner->getRecord()->ClassName, $excluded);
+        
+        /** @var \SilverStripe\ORM\DataObject */
+        $record = $this->owner->getRecord();
+        return !in_array($record->ClassName, $excluded);
     }
 }
