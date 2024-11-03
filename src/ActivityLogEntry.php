@@ -13,7 +13,7 @@ use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
-use SilverStripe\View\Parsers\HTML4Value;
+use SilverStripe\View\Parsers\HTMLValue;
 
 /**
  * @property string $Action
@@ -122,7 +122,7 @@ class ActivityLogEntry extends DataObject
 
     public function getDetails()
     {
-        return HTML4Value::create('<span style="font-family: Menlo,Monaco,Consolas,Courier New,monospace;white-space: pre;font-size: 0.8em;">' . htmlspecialchars($this->record['Details']) . '</span>');
+        return HTMLValue::create('<span style="font-family: Menlo,Monaco,Consolas,Courier New,monospace;white-space: pre;font-size: 0.8em;">' . htmlspecialchars($this->record['Details']) . '</span>');
     }
 
     public function getDetailsDiff()
@@ -139,13 +139,13 @@ class ActivityLogEntry extends DataObject
             return null;
         }
         $json = json_encode(LogUtils::diff($prev->record['Details'], $this->record['Details']), JSON_PRETTY_PRINT);
-        return HTML4Value::create('<span style="font-family: Menlo,Monaco,Consolas,Courier New,monospace;white-space: pre;font-size: 0.8em;">' . htmlspecialchars($json) . '</span>');
+        return HTMLValue::create('<span style="font-family: Menlo,Monaco,Consolas,Courier New,monospace;white-space: pre;font-size: 0.8em;">' . htmlspecialchars($json) . '</span>');
     }
 
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
-        $fields->addFieldsToTab('Root.Main', TextField::create('DetailsDiff'), 'Details');
+        $fields->addFieldToTab('Root.Main', TextField::create('DetailsDiff'), 'Details');
         $fields->replaceField('MemberID', ReadonlyField::create('MemberTitle')->setValue($this->Member->Title));
         return $fields;
     }
@@ -195,7 +195,7 @@ class ActivityLogEntry extends DataObject
 
     public function canRecover()
     {
-        return $this->owner->Action == ActivityLogEntry::ACTION_DELETE && Permission::check(ActivityLogAdmin::PERM_RECOVER);
+        return $this->Action == ActivityLogEntry::ACTION_DELETE && Permission::check(ActivityLogAdmin::PERM_RECOVER);
     }
 
     public function doRecover()
@@ -203,7 +203,7 @@ class ActivityLogEntry extends DataObject
         if (!$this->canRecover()) {
             throw new Exception('Forbidden');
         }
-        $cls = $this->owner->ObjectClass;
+        $cls = $this->ObjectClass;
         if (!class_exists($cls)) {
             throw new Exception(sprintf('Implementation of %s not available', $cls));
         }
@@ -212,7 +212,7 @@ class ActivityLogEntry extends DataObject
             throw new Exception('Object already exists');
         }
 
-        $data = json_decode($this->owner->getDetailsRaw(), true);
+        $data = json_decode($this->getDetailsRaw(), true);
         /** @var DataObject */
         $obj = new $cls($data, DataObject::CREATE_MEMORY_HYDRATED);
 
