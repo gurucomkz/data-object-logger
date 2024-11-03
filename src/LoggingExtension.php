@@ -29,7 +29,7 @@ class LoggingExtension extends DataExtension
 
     public function isCreated(?bool $setTo = null)
     {
-        if($setTo !== null) {
+        if ($setTo !== null) {
             return $this->owner->setDynamicData('_logger_being_created', $setTo);
         }
         return $this->owner->getDynamicData('_logger_being_created');

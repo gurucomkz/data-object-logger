@@ -10,7 +10,7 @@ env:
     PHP_VERSION: 8.2
     COMPOSER_ALLOW_SUPERUSER: '1' # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
 jobs:
-  phpstan:
+  validation:
     runs-on: ubuntu-20.04
     steps:
     - name: Setup PHP
@@ -20,5 +20,9 @@ jobs:
     - uses: actions/checkout@v4
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
+
     - name: "Run PHPSTAN"
       run: vendor/bin/phpstan
+
+    - name: "Run PHP linting"
+      run: vendor/bin/phpcs
