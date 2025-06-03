@@ -9,6 +9,7 @@ use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\Forms\TextareaField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
@@ -35,6 +36,8 @@ class ActivityLogEntry extends DataObject
 
     private static $table_name = 'ActivityLogEntry';
     private static $excluded_classes = [];
+
+    private static $compress_body = false;
 
     private static $db = [
         'Action' => "Enum('Create,Update,Delete,Publish,Unpublish,Archive,Unarchive')",
@@ -108,7 +111,37 @@ class ActivityLogEntry extends DataObject
 
     public function getDetailsRaw()
     {
-        return $this->record['Details'];
+        return $this->Details;
+    }
+
+    public function setDetails(string $v)
+    {
+        if ($this->config()->get('compress_body') && function_exists('gzdeflate')) {
+            $compressed = self::COMPRESSED_SIGNATURE . base64_encode(gzdeflate($v, 9)); // Use maximum compression level
+            if ($compressed !== false) {
+                $this->record['Details'] = $compressed;
+                return;
+            }
+        }
+        $this->record['Details'] = $v;
+    }
+
+    const COMPRESSED_SIGNATURE = 'base64/deflate:';
+    public function getDetails(): string
+    {
+        $body = $this->record['Details'];
+
+        if (substr($body, 0, strlen(self::COMPRESSED_SIGNATURE)) == self::COMPRESSED_SIGNATURE) {
+            if (!function_exists('gzinflate')) {
+                return 'This email body is compressed with zlib. Please install zlib module to see it.';
+            }
+            $raw = base64_decode(substr($body, strlen(self::COMPRESSED_SIGNATURE)));
+            if ($raw !== false) {
+                return gzinflate($raw);
+            }
+        }
+
+        return $body;
     }
 
     /**
@@ -120,9 +153,11 @@ class ActivityLogEntry extends DataObject
         return DataObject::get($this->ObjectClass)->byID($this->ObjectID) ?? Injector::inst()->create($this->ObjectClass);
     }
 
-    public function getDetails()
+    public function getDetailsPretty()
     {
-        return HTMLValue::create('<span style="font-family: Menlo,Monaco,Consolas,Courier New,monospace;white-space: pre;font-size: 0.8em;">' . htmlspecialchars($this->record['Details']) . '</span>');
+        return $this->makeDisplayField(
+            json_decode(json_encode($this->Details, JSON_PRETTY_PRINT))
+        );
     }
 
     public function getDetailsDiff()
@@ -138,14 +173,24 @@ class ActivityLogEntry extends DataObject
         if (!$prev) {
             return null;
         }
-        $json = json_encode(LogUtils::diff($prev->record['Details'], $this->record['Details']), JSON_PRETTY_PRINT);
-        return HTMLValue::create('<span style="font-family: Menlo,Monaco,Consolas,Courier New,monospace;white-space: pre;font-size: 0.8em;">' . htmlspecialchars($json) . '</span>');
+        $json = json_encode(LogUtils::diff($prev->Details, $this->Details), JSON_PRETTY_PRINT);
+        return $this->makeDisplayField($json);
+    }
+
+    public function makeDisplayField($innerValue)
+    {
+        return HTMLValue::create(
+            '<span style="font-family: Menlo,Monaco,Consolas,Courier New,monospace;white-space: pre;font-size: 0.8em;">'
+            . htmlspecialchars($innerValue)
+            . '</span>'
+        );
     }
 
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
         $fields->addFieldToTab('Root.Main', TextField::create('DetailsDiff'), 'Details');
+        $fields->replaceField('Details', TextareaField::create('DetailsPretty')->setReadonly(true)->setRows(20));
         $fields->replaceField('MemberID', ReadonlyField::create('MemberTitle')->setValue($this->Member->Title));
         return $fields;
     }

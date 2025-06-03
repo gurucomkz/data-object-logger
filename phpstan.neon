@@ -16,6 +16,7 @@ parameters:
         - '#Static property [a-zA-Z0-9\\_]+::\$default_sort is never read, only written\.#'
         - '#Static property [a-zA-Z0-9\\_]+::\$excluded_classes is never read, only written\.#'
         - '#Static property [a-zA-Z0-9\\_]+::\$searchable_fields is never read, only written\.#'
+        - '#Static property [a-zA-Z0-9\\_]+::\$compress_body is never read, only written\.#'
     parallel:
         maximumNumberOfProcesses: 4
     level: 5
